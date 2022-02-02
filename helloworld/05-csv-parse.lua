@@ -1,16 +1,15 @@
-dbg = require('debugger')
 json = require('json')
-inspect = require('inspect')
 stringx = require('pl.stringx')
+inspect = require('inspect')
 
-header = 'pid,name,country,languages,description'
+line_header = 'pid,name,country,languages,description'
 line1 = '123,Tom,CN,zh-hans,hello hi'
 line2 = '456,Jason,US,["en", "zh", "ja", "fr"],this is a person description'
 -- content = [[
 -- pid,name,country,languages,description
 -- 123,Jason,US,["en", "zh", "ja", "fr"],this is a person description
 -- ]]
-content = header .. '\n' .. line1 .. '\n' .. line2
+content = '\n' .. line1 .. '\n' .. line2
 
 -- print(content)
 for line in stringx.lines(content) do
@@ -28,7 +27,7 @@ function parse_line(line, sep)
     end
     if not pos then pos = string.len(line) + 1 end
     local v = string.sub(line, 1, pos - 1)
-    if v then
+    if v and string.len(v) > 0 then
         print('found value: ' .. v)
         table.insert(values, v)
     end
@@ -45,12 +44,19 @@ function parse_line(line, sep)
 end
 
 tb = {}
+headers = parse_line(line_header)
+table.insert(tb, headers)
 for line in stringx.lines(content) do
     local values = parse_line(line)
-    if #values > 0 then
-        table.insert(tb, values)
+    if values and #values > 0 and #values == #headers then
+        local d = {}
+        for i, v in pairs(headers) do
+            d[v] = values[i]
+        end
+        -- table.insert(tb, values)
+        table.insert(tb, d)
     end
 end
 print('LOADED CSV CONTENT...')
-print(inspect(tb))
+print( inspect(tb) )
 print('[ OK. ]')
