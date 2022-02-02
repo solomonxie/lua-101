@@ -13,3 +13,4 @@ data = {
 
 inspect = require('inspect')
 print(inspect(data))
+print(inspect(getmetatable(inspect)))
