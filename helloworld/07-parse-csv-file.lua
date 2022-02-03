@@ -1,6 +1,4 @@
-inspect = require('inspect')
 M = {}
-
 
 function M.parse_csv_line(line, sep)
     if not line then return nil end
@@ -14,8 +12,14 @@ function M.parse_csv_line(line, sep)
     if not pos then pos = string.len(line) + 1 end
     local v = string.sub(line, 1, pos - 1)
     v = string.gsub(string.gsub(v, '^%s+', ''), '%s+$', '')
+    if string.sub(v, 1, 1) == '"' and string.sub(v, #v, #v) == '"' then
+        v = string.sub(v, 2, #v - 1)
+    end
+    if string.sub(v, 1, 1) == '\'' and string.sub(v, #v, #v) == '\'' then
+        v = string.sub(v, 2, #v - 1)
+    end
     if v and string.len(v) > 0 then
-        print('found value: ' .. v)
+        -- print('found value: ' .. v)
         table.insert(values, v)
     end
     local more = string.sub(line, pos + 1)
@@ -55,6 +59,38 @@ function M.parse_file(path, sep)
     return tb
 end
 
-tb = M.parse_file('dataset/student.csv')
-print( inspect(tb) )
-print('[ OK. ]')
+
+function M.parse_file_by_line(path, sep)
+    print('LODING CONTENT...')
+    if not sep then sep = ',' end
+    local i = 0
+    local iter = io.lines(path)
+    local headers = M.parse_csv_line(iter())
+    return function ()
+        i = i +1
+        local line = iter()
+        local vlist = M.parse_csv_line(line) or {}
+        if vlist and #vlist > 0 then
+            local d = {}
+            for j, col in pairs(headers) do
+                d[col] = vlist[j]
+            end
+            return i, d
+        else
+            print('DONE: LOADED CSV CONTENT...')
+        end
+    end
+end
+
+local path = 'dataset/student.csv'
+-- inspect = require('inspect')
+-- local tb = M.parse_file(path)
+-- print( inspect(tb) )
+for i, row in M.parse_file_by_line(path) do
+    local x = i
+    -- print(i)
+    -- print(inspect(row))
+end
+-- print('[ OK. ]')
+
+return M

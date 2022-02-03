@@ -18,13 +18,13 @@ print(data['$@!'])
 print(data['sub-table']['a'])
 
 
-function tprint (tb, indent)
-    if not indent then indent = 0 end
+function pprint (tb, indent)
+    if not indent then indent = 4 end
     for k, v in pairs(tb) do
         local formatting = string.rep("  ", indent) .. k .. ": "
         if type(v) == "table" then
             print(formatting)
-            tprint(v, indent+1)
+            pprint(v, indent + indent)
         elseif type(v) == 'boolean' then
             print(formatting .. tostring(v))
         else
@@ -34,4 +34,4 @@ function tprint (tb, indent)
 end
 
 print('DISPLAY TABLE ========>')
-tprint(data, 4)
+pprint(data, 4)
