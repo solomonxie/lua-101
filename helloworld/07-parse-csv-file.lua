@@ -87,7 +87,7 @@ local path = 'dataset/student.csv'
 -- local tb = M.parse_file(path)
 -- print( inspect(tb) )
 for i, row in M.parse_file_by_line(path) do
-    local x = i
+    i, row = i, row
     -- print(i)
     -- print(inspect(row))
 end
